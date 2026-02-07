@@ -1,0 +1,27 @@
+[package]
+name = "airdrop-example"
+version = "0.1.0"
+description = "Example airdrop program using Stratum state primitives"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "airdrop_example"
+
+[features]
+default = []
+cpi = ["no-entrypoint"]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+idl-build = ["anchor-lang/idl-build"]
+anchor-debug = []
+custom-heap = []
+custom-panic = []
+
+[dependencies]
+anchor-lang = "0.32.1"
+stratum = { path = "../stratum", features = ["cpi"] }
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(target_os, values("solana"))'] }

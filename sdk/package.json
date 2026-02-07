@@ -1,0 +1,34 @@
+{
+  "name": "@stratum/sdk",
+  "version": "0.1.0",
+  "description": "TypeScript SDK for Stratum - State primitives for Solana",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "test": "vitest",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.32.0",
+    "@solana/web3.js": "^1.95.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "solana",
+    "anchor",
+    "merkle",
+    "bitfield",
+    "state"
+  ],
+  "license": "MIT"
+}
