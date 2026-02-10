@@ -27,23 +27,95 @@ Solana's account model charges rent for on-chain storage, making state costs a f
 - **Events** — History summarization without state bloat. Track aggregate statistics on-chain while emitting detailed events.
 - **Resurrection** — Archive state off-chain and restore it later with merkle proofs.
 
-## Example
+## Programs
 
-The `airdrop-example` program demonstrates all primitives working together:
+### airdrop-example
+
+Demonstrates all primitives working together:
 
 - Merkle tree whitelist for eligible recipients
 - Bitfield claim tracking (2,048 claims per chunk at ~0.003 SOL)
 - Expiry with cleanup rewards for reclaiming unused tokens
 - Event-based claim history
 
+### stratum-orderbook
+
+A state-optimized on-chain order book that uses Stratum's primitives to reduce state costs by 99%+ compared to traditional on-chain order storage.
+
+**How it works:**
+1. Orders are collected off-chain by a cranker and batched into epochs
+2. Each epoch gets an immutable merkle root (32 bytes for the entire batch)
+3. Bitfield chunks track order state (active/filled/cancelled) at 0.13 bytes per order
+4. Settlement verifies merkle proofs for both maker and taker, checks bitfields, validates price constraints, and transfers tokens — all in a single instruction
+5. Expired orders and settlement receipts can be cleaned up by anyone for a crank reward
+
+**State cost comparison (10,000 orders):**
+| Approach | State Size | Rent Cost |
+|----------|-----------|-----------|
+| Traditional (account per order) | ~2 MB | ~6.9 SOL |
+| Stratum-optimized (merkle + bitfield) | ~2.5 KB | ~0.02 SOL |
+
+**Instructions:**
+- `create_order_book` — Initialize an order book for a trading pair
+- `create_epoch` / `finalize_epoch` — Epoch lifecycle
+- `submit_epoch_root` — Cranker submits computed merkle root
+- `create_order_chunk` — Create bitfield chunk for order state tracking
+- `settle_match` — Verify merkle proofs + check bitfields + validate price + transfer tokens
+- `cancel_order` — Maker cancels with proof verification + refund
+- `cleanup_expired_orders` / `cleanup_settlement` — Incentivized state reclamation
+
+## Off-Chain Cranker
+
+The `app/orderbook-cranker` package provides the off-chain matching engine:
+
+- **OrderStore** — Maintains sorted bid/ask books in memory, builds merkle trees per epoch
+- **OrderMatcher** — Price-time priority matching (fills at maker's price when bid >= ask)
+- **EpochCranker** — Collects orders, builds merkle tree, submits root on-chain, finalizes epoch
+- **SettlementSubmitter** — Builds and submits settlement transactions with merkle proofs
+
+```bash
+# Run the cranker
+cd app/orderbook-cranker
+export CRANKER_KEYPAIR_PATH=~/.config/solana/id.json
+export ORDER_BOOK_ADDRESS=<order-book-pubkey>
+export RPC_URL=http://127.0.0.1:8899
+yarn dev
+```
+
+## SDK
+
+The TypeScript SDK (`@stratum/sdk`) provides client-side utilities:
+
+- **MerkleTree** — Build trees, generate proofs, verify proofs. Factory methods: `fromPubkeys()`, `fromPubkeyAmounts()`, `fromOrderLeaves()`
+- **Bitfield** — Client-side bitfield simulation, index splitting, PDA derivation
+- **OrderBookClient** — PDA derivation, order leaf serialization/hashing, on-chain state reads
+
+```typescript
+import { MerkleTree, OrderBookClient, Bitfield } from '@stratum/sdk';
+import { Connection, PublicKey } from '@solana/web3.js';
+
+// Build a merkle tree for an airdrop
+const tree = MerkleTree.fromPubkeys(recipients);
+const proof = tree.getProofArray(index); // For Anchor
+
+// Order book client
+const client = new OrderBookClient(connection, programId);
+const [orderBookPda] = client.deriveOrderBookPda(authority, baseMint, quoteMint);
+const orderHash = client.hashOrderLeaf(order);
+const tree = client.buildOrderMerkleTree(orders);
+```
+
 ## Project Structure
 
 ```
 programs/
-  stratum/          # Core state primitives library
-  airdrop-example/  # Example program using Stratum
-sdk/                # TypeScript SDK (merkle tree, bitfield utilities)
-tests/              # Integration tests
+  stratum/              # Core state primitives library
+  airdrop-example/      # Example: airdrop with all primitives
+  stratum-orderbook/    # State-optimized on-chain order book
+sdk/                    # TypeScript SDK (@stratum/sdk)
+app/
+  orderbook-cranker/    # Off-chain matching engine
+tests/                  # Integration tests
 ```
 
 ## Development
