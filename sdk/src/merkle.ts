@@ -234,4 +234,21 @@ export class MerkleTree {
 
     return this.leaves.findIndex((leaf) => leaf.equals(targetHash));
   }
+
+  /**
+   * Create a merkle tree from serialized order leaves.
+   *
+   * Each order leaf is a Buffer containing the AnchorSerialize-compatible
+   * representation of an OrderLeaf struct:
+   *   maker(32) + order_id(8) + side(1) + price(8) + amount(8) +
+   *   epoch_index(4) + order_index(4) + created_at(8) + expires_at(8)
+   *
+   * The leaves are hashed using hashLeaf() for domain separation.
+   */
+  static fromOrderLeaves(
+    orderLeaves: (Buffer | Uint8Array)[]
+  ): MerkleTree {
+    // Each order leaf is already serialized, hash via constructor
+    return new MerkleTree(orderLeaves);
+  }
 }
