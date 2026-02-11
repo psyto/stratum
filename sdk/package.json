@@ -2,6 +2,13 @@
   "name": "@stratum/sdk",
   "version": "0.1.0",
   "description": "TypeScript SDK for Stratum - State primitives for Solana",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stratum-protocol/stratum.git",
+    "directory": "sdk"
+  },
+  "author": "Stratum Contributors",
+  "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -29,6 +36,5 @@
     "merkle",
     "bitfield",
     "state"
-  ],
-  "license": "MIT"
+  ]
 }
