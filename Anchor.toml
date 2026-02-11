@@ -8,7 +8,7 @@ skip-lint = false
 [programs.localnet]
 stratum = "97VX5yBvf55TdgpV6Cmc7pXdgshWyeCrHvn71bX6CHcJ"
 airdrop_example = "6TTbWd9hqr6D2ijnT7RPm3EZws32Uiyfn52FEaJUvw6r"
-stratum_orderbook = "OBKm1111111111111111111111111111111111111111"
+stratum_orderbook = "4QYpTZoHt34x1JqtWD5fKo1UgUwFgCQoHCqKpCHFcfyT"
 
 [registry]
 url = "https://api.apr.dev"
