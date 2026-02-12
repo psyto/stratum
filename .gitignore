@@ -4,6 +4,9 @@ target
 **/*.rs.bk
 node_modules
 test-ledger
+.env
+.env.*
+!.env.example
 .yarn
 dist
 deck.html
