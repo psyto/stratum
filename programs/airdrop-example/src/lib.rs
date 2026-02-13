@@ -357,7 +357,7 @@ pub mod airdrop_example {
         // Get remaining tokens by reading vault data
         let vault_data = ctx.accounts.vault.try_borrow_data()?;
         let remaining = if vault_data.len() >= 72 {
-            u64::from_le_bytes(vault_data[64..72].try_into().unwrap())
+            u64::from_le_bytes(vault_data[64..72].try_into().map_err(|_| AirdropError::Overflow)?)
         } else {
             0
         };
