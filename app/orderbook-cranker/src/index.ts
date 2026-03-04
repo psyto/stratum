@@ -22,10 +22,14 @@ function createConfig(): CrankerConfig {
     throw new Error('ORDER_BOOK_ADDRESS environment variable required');
   }
 
+  const programId =
+    process.env.PROGRAM_ID || '4QYpTZoHt34x1JqtWD5fKo1UgUwFgCQoHCqKpCHFcfyT';
+
   return {
     rpcUrl: process.env.RPC_URL || 'http://127.0.0.1:8899',
     keypairPath,
     orderBookAddress: new PublicKey(orderBookAddress),
+    programId: new PublicKey(programId),
     maxOrdersPerEpoch: parseInt(process.env.MAX_ORDERS_PER_EPOCH || '2048'),
     epochRotationIntervalSec: parseInt(
       process.env.EPOCH_ROTATION_INTERVAL_SEC || '60'

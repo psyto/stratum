@@ -45,6 +45,8 @@ export interface CrankerConfig {
   keypairPath: string;
   /** Order book PDA */
   orderBookAddress: PublicKey;
+  /** Stratum orderbook program ID */
+  programId: PublicKey;
   /** Maximum orders per epoch before rotation */
   maxOrdersPerEpoch: number;
   /** Epoch rotation interval in seconds */

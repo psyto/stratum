@@ -1,7 +1,11 @@
-import { Connection, PublicKey, Keypair, Transaction } from '@solana/web3.js';
+import { Connection, PublicKey, Keypair, Transaction, SystemProgram } from '@solana/web3.js';
+import { AnchorProvider, Program, Wallet, BN } from '@coral-xyz/anchor';
+import { TOKEN_PROGRAM_ID, getAssociatedTokenAddress } from '@solana/spl-token';
 import { MerkleTree } from '@stratum/sdk';
-import type { Order, MatchResult } from './types';
+import type { Order, MatchResult, OrderSide } from './types';
 import { OrderStore } from './order-store';
+import type { StratumOrderbook } from '../../../target/types/stratum_orderbook';
+import idl from '../../../target/idl/stratum_orderbook.json';
 
 /**
  * Settlement transaction builder and submitter.
@@ -17,6 +21,7 @@ export class SettlementSubmitter {
   private crankerKeypair: Keypair;
   private orderBookAddress: PublicKey;
   private programId: PublicKey;
+  private program: Program<StratumOrderbook>;
 
   constructor(
     connection: Connection,
@@ -28,6 +33,15 @@ export class SettlementSubmitter {
     this.crankerKeypair = crankerKeypair;
     this.orderBookAddress = orderBookAddress;
     this.programId = programId;
+
+    const wallet = new Wallet(crankerKeypair);
+    const provider = new AnchorProvider(connection, wallet, {
+      commitment: 'confirmed',
+    });
+    this.program = new Program<StratumOrderbook>(
+      idl as StratumOrderbook,
+      provider
+    );
   }
 
   /**
@@ -80,27 +94,81 @@ export class SettlementSubmitter {
         `fill=${fillAmount}`
     );
 
-    // In production, this would build the actual Anchor transaction:
-    // const tx = await program.methods
-    //   .settleMatch(
-    //     makerOrderData, makerProofArrays, makerOrder.orderIndex,
-    //     takerOrderData, takerProofArrays, takerOrder.orderIndex,
-    //     new BN(fillAmount)
-    //   )
-    //   .accounts({
-    //     orderBook: this.orderBookAddress,
-    //     makerEpoch: epochPda,
-    //     takerEpoch: takerEpochPda,
-    //     makerChunk: makerChunkPda,
-    //     takerChunk: takerChunkPda,
-    //     baseVault: baseVaultPda,
-    //     quoteVault: quoteVaultPda,
-    //     ...
-    //   })
-    //   .signers([this.crankerKeypair])
-    //   .rpc();
+    // Derive settlement receipt PDA
+    const makerOrderIdBuf = Buffer.alloc(8);
+    makerOrderIdBuf.writeBigUInt64LE(BigInt(makerOrder.orderId));
+    const takerOrderIdBuf = Buffer.alloc(8);
+    takerOrderIdBuf.writeBigUInt64LE(BigInt(takerOrder.orderId));
+    const [settlementReceiptPda] = PublicKey.findProgramAddressSync(
+      [
+        Buffer.from('settlement'),
+        this.orderBookAddress.toBuffer(),
+        makerOrderIdBuf,
+        takerOrderIdBuf,
+      ],
+      this.programId
+    );
 
-    return `settle_${makerOrder.orderId}_${takerOrder.orderId}_${fillAmount}`;
+    // Fetch order book state to get fee_vault and mints
+    const orderBookAccount = await this.program.account.orderBook.fetch(
+      this.orderBookAddress
+    );
+
+    // Build OrderLeaf structs for the instruction
+    const makerOrderLeaf = this.buildOrderLeaf(makerOrder);
+    const takerOrderLeaf = this.buildOrderLeaf(takerOrder);
+
+    // Resolve maker/taker token accounts
+    const makerBaseAccount = await getAssociatedTokenAddress(
+      orderBookAccount.baseMint,
+      makerOrder.maker
+    );
+    const makerQuoteAccount = await getAssociatedTokenAddress(
+      orderBookAccount.quoteMint,
+      makerOrder.maker
+    );
+    const takerBaseAccount = await getAssociatedTokenAddress(
+      orderBookAccount.baseMint,
+      takerOrder.maker
+    );
+    const takerQuoteAccount = await getAssociatedTokenAddress(
+      orderBookAccount.quoteMint,
+      takerOrder.maker
+    );
+
+    const tx = await this.program.methods
+      .settleMatch(
+        makerOrderLeaf,
+        makerProofArrays,
+        makerOrder.orderIndex,
+        takerOrderLeaf,
+        takerProofArrays,
+        takerOrder.orderIndex,
+        new BN(fillAmount)
+      )
+      .accounts({
+        orderBook: this.orderBookAddress,
+        makerEpoch: epochPda,
+        takerEpoch: takerEpochPda,
+        makerChunk: makerChunkPda,
+        takerChunk: takerChunkPda,
+        settlementReceipt: settlementReceiptPda,
+        baseVault: baseVaultPda,
+        quoteVault: quoteVaultPda,
+        feeVault: orderBookAccount.feeVault,
+        makerBaseAccount,
+        makerQuoteAccount,
+        takerBaseAccount,
+        takerQuoteAccount,
+        cranker: this.crankerKeypair.publicKey,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        systemProgram: SystemProgram.programId,
+      })
+      .signers([this.crankerKeypair])
+      .rpc();
+
+    console.log(`Settlement submitted: tx=${tx}`);
+    return tx;
   }
 
   /**
@@ -126,6 +194,32 @@ export class SettlementSubmitter {
     }
 
     return signatures;
+  }
+
+  // --- Helpers ---
+
+  private buildOrderLeaf(order: Order): {
+    maker: PublicKey;
+    orderId: BN;
+    side: { bid: {} } | { ask: {} };
+    price: BN;
+    amount: BN;
+    epochIndex: number;
+    orderIndex: number;
+    createdAt: BN;
+    expiresAt: BN;
+  } {
+    return {
+      maker: order.maker,
+      orderId: new BN(order.orderId),
+      side: order.side === 0 ? { bid: {} } : { ask: {} },
+      price: new BN(order.price),
+      amount: new BN(order.amount),
+      epochIndex: order.epochIndex,
+      orderIndex: order.orderIndex,
+      createdAt: new BN(order.createdAt),
+      expiresAt: new BN(order.expiresAt),
+    };
   }
 
   // --- PDA derivation helpers ---
