@@ -1,0 +1,61 @@
+{
+  "name": "Fabrknt Data",
+  "slug": "fabrknt-data",
+  "description": "High-performance data optimization utilities for blockchain applications, including Merkle tree operations and compact bitfield management.",
+  "category": "developer-tools",
+  "author": "Fabrknt",
+  "version": "0.1.0",
+  "chains": [
+    {
+      "id": "solana",
+      "name": "Solana"
+    },
+    {
+      "id": "ethereum",
+      "name": "Ethereum"
+    }
+  ],
+  "plans": [
+    {
+      "id": "starter",
+      "name": "Starter",
+      "price": 0,
+      "description": "Free plan with access to all Merkle tree and bitfield endpoints.",
+      "features": [
+        "Merkle tree build, proof, verify, and hash",
+        "Bitfield create, set, check, and stats",
+        "100 requests per minute"
+      ],
+      "rpc_methods": [
+        "POST /v1/merkle/build",
+        "POST /v1/merkle/proof",
+        "POST /v1/merkle/verify",
+        "POST /v1/merkle/hash",
+        "POST /v1/bitfield/create",
+        "POST /v1/bitfield/set",
+        "POST /v1/bitfield/check",
+        "POST /v1/bitfield/stats"
+      ]
+    },
+    {
+      "id": "pro",
+      "name": "Pro",
+      "price": null,
+      "description": "Pro plan with future on-chain operation support.",
+      "features": [
+        "All Starter features",
+        "On-chain Merkle root publishing (coming soon)",
+        "On-chain bitfield anchoring (coming soon)",
+        "Higher rate limits"
+      ],
+      "rpc_methods": []
+    }
+  ],
+  "healthcheck": "GET /healthcheck",
+  "provisioning": {
+    "provision": "POST /provision",
+    "update": "PUT /provision",
+    "deactivate": "DELETE /provision/deactivate",
+    "deprovision": "DELETE /provision"
+  }
+}
