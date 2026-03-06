@@ -29,8 +29,9 @@ stratum/
 │   │                      #   MerkleTree, Bitfield, OrderMatcher, types
 │   ├── solana/            # @stratum/solana — Solana SDK
 │   │                      #   PDA derivation, OrderBookClient, solanaHash
-│   └── evm/               # @stratum/evm — EVM SDK
-│                          #   EvmMerkleTree, event parser, archive manager
+│   ├── evm/               # @stratum/evm — EVM SDK
+│   │                      #   EvmMerkleTree, event parser, archive manager
+│   └── qn-addon/          # Fabrknt Data Optimization — QuickNode Marketplace add-on
 ├── contracts/
 │   ├── solana/            # Rust/Anchor programs
 │   │   └── programs/
@@ -152,6 +153,33 @@ The `apps/orderbook-cranker` package provides the off-chain matching engine:
 - **OrderMatcher** — Price-time priority matching
 - **EpochCranker** — Collects orders, builds merkle tree, submits root on-chain
 - **SettlementSubmitter** — Builds settlement transactions with merkle proofs
+
+## QuickNode Marketplace Add-on
+
+The **Fabrknt Data Optimization** add-on (`fabrknt-data-optimization`) exposes Stratum's Merkle and Bitfield primitives as a hosted API on the [QuickNode Marketplace](https://marketplace.quicknode.com/). Source lives in `packages/qn-addon/`.
+
+### Endpoints
+
+**Merkle**
+
+- `POST /v1/merkle/build` — Build a Merkle tree from a set of leaves
+- `POST /v1/merkle/proof` — Generate an inclusion proof for a leaf
+- `POST /v1/merkle/verify` — Verify a proof against a root
+- `POST /v1/merkle/hash` — Hash a value using the tree's hash function
+
+**Bitfield**
+
+- `POST /v1/bitfield/create` — Create a new bitfield
+- `POST /v1/bitfield/set` — Set a bit in a bitfield
+- `POST /v1/bitfield/check` — Check whether a bit is set
+- `POST /v1/bitfield/stats` — Get bitfield statistics
+
+### Plans
+
+| Plan | Price | Access |
+|------|-------|--------|
+| **Starter** | Free | All endpoints |
+| **Pro** | TBD | All endpoints + future on-chain operations |
 
 ## Development
 
