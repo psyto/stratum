@@ -18,7 +18,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@stratum/core": "0.1.0",
+    "@stratum/core": "workspace:*",
     "ethers": "^6.0.0"
   },
   "devDependencies": {

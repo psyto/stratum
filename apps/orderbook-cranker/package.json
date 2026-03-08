@@ -13,8 +13,8 @@
     "@coral-xyz/anchor": "^0.32.0",
     "@solana/web3.js": "^1.95.0",
     "@solana/spl-token": "^0.4.0",
-    "@stratum/core": "0.1.0",
-    "@stratum/solana": "0.1.0"
+    "@stratum/core": "workspace:*",
+    "@stratum/solana": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

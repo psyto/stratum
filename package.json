@@ -1,24 +1,25 @@
 {
   "name": "stratum",
   "private": true,
-  "workspaces": [
-    "packages/*",
-    "apps/*"
-  ],
   "scripts": {
-    "build": "yarn workspaces foreach -A run build",
-    "test": "yarn workspaces foreach -A run test",
+    "build": "turbo run build",
+    "test": "turbo run test",
     "test:core": "cd packages/core && yarn test",
     "test:evm:sdk": "cd packages/evm && yarn test",
     "test:solana": "cd contracts/solana && anchor test",
     "test:evm": "cd contracts/evm && forge test -vvv",
     "test:evm:fuzz": "cd contracts/evm && forge test --fuzz-runs 10000",
     "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
-    "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check"
+    "lint": "turbo run lint"
   },
   "devDependencies": {
     "prettier": "^2.6.2",
+    "turbo": "^2.4.0",
     "typescript": "^5.7.3"
   },
-  "license": "ISC"
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "ISC",
+  "packageManager": "pnpm@10.31.0"
 }

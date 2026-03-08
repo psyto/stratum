@@ -1,0 +1,9 @@
+packages:
+  - "packages/*"
+  - "apps/*"
+allowBuilds:
+  better-sqlite3: false
+  bigint-buffer: false
+  bufferutil: false
+  esbuild: false
+  utf-8-validate: false

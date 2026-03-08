@@ -18,13 +18,7 @@ export interface OrderLeaf {
   expiresAt: number;
 }
 
-/** A matched trade between two orders */
-export interface MatchResult<T = OrderLeaf> {
-  makerOrder: T;
-  takerOrder: T;
-  fillAmount: number;
-  fillPrice: number;
-}
+// MatchResult is exported from matcher.ts
 
 /** Merkle proof type */
 export type MerkleProof = Uint8Array[];
