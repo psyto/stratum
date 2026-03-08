@@ -185,27 +185,27 @@ The **Fabrknt Data Optimization** add-on (`fabrknt-data-optimization`) exposes S
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) and [Yarn](https://yarnpkg.com/) — TypeScript packages
+- [Node.js](https://nodejs.org/) and [pnpm](https://pnpm.io/) — TypeScript packages (monorepo uses `packageManager: pnpm@10.31.0`)
 - [Foundry](https://book.getfoundry.sh/) — EVM contracts
 - [Rust](https://rustup.rs/) + [Anchor](https://www.anchor-lang.com/) — Solana contracts
 
 ### Install
 
 ```sh
-yarn install
+pnpm install
 ```
 
 ### Test
 
 ```sh
 # All TypeScript packages
-yarn test
+pnpm test
 
 # Core (chain-agnostic)
-cd packages/core && yarn test
+cd packages/core && pnpm test
 
 # EVM SDK
-cd packages/evm && yarn test
+cd packages/evm && pnpm test
 
 # EVM contracts (Foundry)
 cd contracts/evm && forge test -vvv
@@ -220,8 +220,8 @@ cd contracts/solana && anchor test
 ### Build
 
 ```sh
-# TypeScript packages
-yarn build
+# TypeScript packages (runs turbo)
+pnpm build
 
 # EVM contracts
 cd contracts/evm && forge build
