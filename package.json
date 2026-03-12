@@ -2,6 +2,7 @@
   "name": "stratum",
   "private": true,
   "scripts": {
+    "prepare": "pnpm run build",
     "build": "turbo run build",
     "test": "turbo run test",
     "test:core": "cd packages/core && yarn test",
