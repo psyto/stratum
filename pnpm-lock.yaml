@@ -23,18 +23,18 @@ importers:
       '@coral-xyz/anchor':
         specifier: ^0.32.0
         version: 0.32.1(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
+      '@fabrknt/stratum-core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@fabrknt/stratum-solana':
+        specifier: workspace:*
+        version: link:../../packages/solana
       '@solana/spl-token':
         specifier: ^0.4.0
         version: 0.4.14(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.3)(utf-8-validate@6.0.6)
       '@solana/web3.js':
         specifier: ^1.95.0
         version: 1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
-      '@stratum/core':
-        specifier: workspace:*
-        version: link:../../packages/core
-      '@stratum/solana':
-        specifier: workspace:*
-        version: link:../../packages/solana
     devDependencies:
       '@types/node':
         specifier: ^20.0.0
@@ -63,7 +63,7 @@ importers:
 
   packages/evm:
     dependencies:
-      '@stratum/core':
+      '@fabrknt/stratum-core':
         specifier: workspace:*
         version: link:../core
       ethers:
@@ -82,7 +82,7 @@ importers:
 
   packages/qn-addon:
     dependencies:
-      '@stratum/core':
+      '@fabrknt/stratum-core':
         specifier: workspace:*
         version: link:../core
       better-sqlite3:
@@ -131,12 +131,12 @@ importers:
       '@coral-xyz/anchor':
         specifier: ^0.32.0
         version: 0.32.1(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
+      '@fabrknt/stratum-core':
+        specifier: workspace:*
+        version: link:../core
       '@solana/web3.js':
         specifier: ^1.95.0
         version: 1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6)
-      '@stratum/core':
-        specifier: workspace:*
-        version: link:../core
     devDependencies:
       '@types/node':
         specifier: ^20.0.0

@@ -1,6 +1,6 @@
 {
   "name": "@fabrknt/stratum-core",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Chain-agnostic state primitives — merkle trees, bitfields, order matching",
   "main": "dist/index.js",
   "module": "dist/index.mjs",

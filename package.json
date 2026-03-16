@@ -21,6 +21,6 @@
   "engines": {
     "node": ">=20"
   },
-  "license": "ISC",
+  "license": "MIT",
   "packageManager": "pnpm@10.31.0"
 }
